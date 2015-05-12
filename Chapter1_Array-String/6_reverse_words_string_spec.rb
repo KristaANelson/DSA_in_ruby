@@ -8,19 +8,23 @@ class WordReverser
 
   def reverse_words_without_using_reverse_or_split(string)
     word = ""
-    tracker = []
+    tracker = ""
     string.chars.each do |char|
       if char != " "
         word += char
       else
-        tracker.unshift(word) if word != ""
+        if tracker == "" && word != ""
+          tracker = word
+        elsif tracker != "" && word != ""
+          tracker = word + " " + tracker
+        end
         word = ""
       end
     end
-    tracker.unshift(word) if word != ""
-    tracker.join(" ")
+    word + " " + tracker if word != ""
   end
 end
+
 require 'rspec'
 
 RSpec.describe WordReverser do
@@ -40,7 +44,7 @@ RSpec.describe WordReverser do
     expect(answer).to eq("blue is sky the")
   end
 
-  it 'can reverse a string with double word by word without using reverse or split' do
+  it 'can reverse a string word by word without using reverse or split' do
     wr = WordReverser.new
 
     answer = wr.reverse_words_without_using_reverse_or_split("the sky is blue")
