@@ -15,14 +15,32 @@
 # If no valid conversion could be performed, a zero value is returned. If the correct
 # value is out of the range of representable values, the maximum integer value
 # (2147483647) or the minimum integer value (–2147483648) is returned.
+
 class AtoiSimulator
-  attr_reader :sign
+  attr_reader :sign, :possible_starters, :first_real_char, :digits, :string_to_int_hash
+
+  def initialize()
+    @first_real_char = nil
+    @digits = []
+    @string_to_int_hash =   {
+                              "1" => 1,
+                              "2" => 2,
+                              "3" => 3,
+                              "4" => 4,
+                              "5" => 5,
+                              "6" => 6,
+                              "7" => 7,
+                              "8" => 8,
+                              "9" => 9,
+                              "0" => 0
+                            }
+    @possible_starters = string_to_int_hash.keys + ["+", "-"]
+  end
+
   def convert_to_number(string)
-    first_real_char = nil
-    digits = []
     string.length.times do |i|
-      if string[i] != " " && first_real_char == nil
-        if !["+", "-"].include?(string[i]) && !("0".."9").to_a.include?(string[i])
+      if valid_starting_char?(string[i])
+        if !possible_starters.include?(string[i])
           return 0
         elsif ["+", "-"].include?(string[i])
           @sign = string[i]
@@ -31,7 +49,7 @@ class AtoiSimulator
           digits << string_to_int_hash[string[i]]
         end
       end
-      if (string[i] == " " && first_real_char != nil) || i == string.length - 1
+      if (!possible_starters.include?(string[i]) && first_real_char != nil) || i == string.length - 1
         result = 0
         mult = 1
         digits.reverse.each do |d|
@@ -44,20 +62,8 @@ class AtoiSimulator
     end
   end
 
-
-  def string_to_int_hash
-    {
-      "1" => 1,
-      "2" => 2,
-      "3" => 3,
-      "4" => 4,
-      "5" => 5,
-      "6" => 6,
-      "7" => 7,
-      "8" => 8,
-      "9" => 9,
-      "0" => 0
-    }
+  def valid_starting_char?(char)
+    possible_starters.include?(char) && first_real_char == nil
   end
 end
 
@@ -76,6 +82,38 @@ RSpec.describe AtoiSimulator do
     as = AtoiSimulator.new
 
     answer = as.convert_to_number("-1")
+
+    expect(answer).to eq(-1)
+  end
+
+  it 'can convert a string to an integer with spaces in front' do
+    as = AtoiSimulator.new
+
+    answer = as.convert_to_number(" 1")
+
+    expect(answer).to eq(1)
+  end
+
+  it 'can convert a string to a negative integer with spaces in front' do
+    as = AtoiSimulator.new
+
+    answer = as.convert_to_number(" -1")
+
+    expect(answer).to eq(-1)
+  end
+
+  it 'can convert a string to a negative integer with spaces at the end' do
+    as = AtoiSimulator.new
+
+    answer = as.convert_to_number(" -1   ")
+
+    expect(answer).to eq(-1)
+  end
+
+  it 'can convert a string to a negative integer with spaces and chars at the end' do
+    as = AtoiSimulator.new
+
+    answer = as.convert_to_number(" -1  a ")
 
     expect(answer).to eq(-1)
   end

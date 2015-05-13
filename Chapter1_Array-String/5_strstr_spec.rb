@@ -8,12 +8,13 @@ class StrStr
     string = string.downcase.chomp.chars
     substring = substring.downcase.chomp.chars
     l = substring.size
+
     string.each_with_index do |char, j|
-      if char == substring[0]
-        return j + 1 if string[j...j+l] == substring
+      if char == substring[0] && string[j...j+l] == substring
+        return j + 1
       end
     end
-    return "#{substring.join} not found"
+    return -1
   end
 end
 
@@ -35,6 +36,6 @@ RSpec.describe StrStr do
   it 'returns the index of the first occurrence of needle in haystack' do
     ss = StrStr.new
     answer = ss.find_first_index("mississippi", "issikppi")
-    expect(answer).to eq("issikppi not found")
+    expect(answer).to eq(-1)
   end
 end
